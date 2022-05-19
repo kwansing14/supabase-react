@@ -11,6 +11,10 @@ function App() {
     fetchPosts();
   }, []);
 
+  /**
+   * REST functions
+   */
+
   const fetchPosts = async () => {
     const { data } = await supabase.from('posts').select();
     console.log('data: ', data);
@@ -22,6 +26,20 @@ function App() {
       .from('posts')
       .insert([{ title: post.title, content: post.content }]);
     setPost({ title: '', content: '' });
+    fetchPosts();
+  };
+
+  const deleteHandler = async (id) => {
+    // const { data, error } = await supabase.from('posts').delete().match({ id });
+    await supabase.from('posts').delete().match({ id });
+    fetchPosts();
+  };
+
+  const editHandler = async (id) => {
+    await supabase
+      .from('posts')
+      .update({ title: post.title, content: post.content })
+      .eq('id', id);
     fetchPosts();
   };
 
@@ -40,8 +58,10 @@ function App() {
       <button onClick={createPost}>Create Post</button>
       {posts.map((post) => (
         <div key={post.id}>
-          <h3>{post.title}</h3>
+          <h4>{post.title}</h4>
           <p>{post.content}</p>
+          <button onClick={() => deleteHandler(post.id)}>delete</button>
+          <button onClick={() => editHandler(post.id)}>edit</button>
         </div>
       ))}
     </div>
